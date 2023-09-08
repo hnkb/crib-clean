@@ -11,6 +11,7 @@ end_of_line = lf
 indent_style = tab
 insert_final_newline = true
 trim_trailing_whitespace = true
+spelling_languages = en-us
 
 [*.md]
 trim_trailing_whitespace = false
