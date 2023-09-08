@@ -22,7 +22,9 @@ namespace crib::graphics::gl
 		virtual void on_resize(int2 dims) override;
 
 	private:
+#if defined(_WIN32)
 		HGLRC ctx = nullptr;
+#endif
 		const app::window& owner;
 	};
 

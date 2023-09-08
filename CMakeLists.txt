@@ -7,15 +7,22 @@ project(crib
 )
 
 add_executable(crib
-	"src/app/win/app_win.cpp"
-	"src/app/win/com.cpp"
-	"src/app/win/error_win.cpp"
-	"src/app/win/string_win.cpp"
-	"src/app/win/window_win.cpp"
 	"src/graphics/gl/context_gl.cpp"
-	"src/graphics/gl/gl_win.cpp"
 	"src/main.cpp"
 )
+
+if (WIN32)
+	target_sources(crib PRIVATE
+		"src/app/win/app_win.cpp"
+		"src/app/win/com.cpp"
+		"src/app/win/error_win.cpp"
+		"src/app/win/string_win.cpp"
+		"src/app/win/window_win.cpp"
+		"src/graphics/gl/gl_win.cpp"
+	)
+
+	target_link_libraries(crib PRIVATE opengl32)
+endif()
 
 target_compile_features(crib PUBLIC cxx_std_17)
 target_include_directories(crib PUBLIC
@@ -27,4 +34,4 @@ if (MSVC)
 endif()
 
 add_subdirectory("third-party")
-target_link_libraries(crib PRIVATE glad opengl32)
+target_link_libraries(crib PRIVATE glad)
