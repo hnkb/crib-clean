@@ -10,6 +10,133 @@
 namespace crib::graphics
 {
 
+	class texture
+	{};
+
+	// imagine, I have different point types
+	// for example
+
+
+	namespace constants
+	{
+		// I can imagine passing nothing as constant data
+		// in that case, I draw the 2D points, "as is", to the screen
+
+		namespace per_frame
+		{
+			struct do_nothing
+			{};
+
+			struct view2d
+			{
+				float3x3 view;
+			};
+
+			struct view3d
+			{
+				float3x3 view;
+			};
+		}
+
+		namespace per_object
+		{
+			struct trafo
+			{
+				float3x3 trafo;  // includes translation, rotation, scaling
+								 // includes world * object positioning
+			};
+
+			struct trafo_color  // for points without color
+			{
+				float3x3 trafo;
+				float3x3 color;
+			};
+
+			// but, this is not very good usage of buffers, because each character needs separate position/trafo but can be drawn with the same color
+
+			// so, basically, a 2D draw cycle like this:
+			//    setColor(xxx)
+			//    drawLine(xxx)
+			//    drawLine(xxx)
+			// ====> oh, for 2D maybe recording a command list is better than creating a scene graph!!!!
+
+			struct z_index
+			{
+				int z_index;
+			};
+		}
+	}
+
+	namespace vertex
+	{
+		// for drawing 2D points
+
+		struct pos2d
+		{
+			float2 pos;
+		};
+
+		struct pos2d_color
+		{
+			float2 pos;
+			byte4 color;
+		};
+
+		struct pos2d_tex
+		{
+			float2 pos;
+			float2 tex;
+		};
+
+
+		// for 3D we have all these configurations, with optional normal as well
+
+		struct pos
+		{
+			float3 pos;
+		};
+
+		struct pos_color
+		{
+			float3 pos;
+			byte4 color;
+		};
+
+		struct pos_texture
+		{
+			float3 pos;
+			float2 tex;
+		};
+
+		struct pos_normal
+		{
+			float3 pos;
+			float3 normal;
+		};
+
+		struct pos_color_normal
+		{
+			float3 pos;
+			byte4 color;
+			float3 normal;
+		};
+
+		struct pos_texture_normal
+		{
+			float3 pos;
+			float2 tex;
+			float3 normal;
+		};
+
+	}
+
+
+	struct pipeline
+	{
+	public:
+	};
+
+
 	class context
 	{
 	public:
