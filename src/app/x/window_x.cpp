@@ -135,6 +135,17 @@ void x11::window::proc(XEvent& event)
 		break;
 
 		case ButtonPress:
+		{
+			// static int numPress = 1;
+			// numPress++;
+			// if (owner.context)
+			// {
+			// 	dynamic_cast<graphics::gl::context*>(owner.context)->bkg = colors[numPress % 5];
+			// 	// owner.context->draw();
+			// 	XClearArea(app::display, wnd, 0, 0, 0, 0, True);
+			// }
+		}
+			printf("Don't click mouse button!\n");
 			break;
 
 		default:

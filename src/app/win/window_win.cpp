@@ -16,6 +16,22 @@ namespace
 
 		if (wnd)
 		{
+			// if ((message >= WM_MOUSEFIRST && message <= WM_MOUSELAST) || message ==
+			// WM_KEYDOWN
+			//	|| message == WM_KEYUP)
+			//{
+			//	if (message == WM_LBUTTONDOWN || message == WM_RBUTTONDOWN
+			//		|| message == WM_MBUTTONDOWN)
+			//		SetCapture(handle);
+
+			//	if (message == WM_LBUTTONUP || message == WM_RBUTTONUP
+			//		|| message == WM_MBUTTONUP)
+			//		ReleaseCapture();
+
+			//	input.push(message, wParam, lParam, timer.now());
+			//	return 0;
+			//}
+
 			switch (message)
 			{
 				case WM_CHAR:
