@@ -7,6 +7,7 @@ project(crib
 )
 
 add_executable(crib
+	"src/app/window.cpp"
 	"src/graphics/gl/context_gl.cpp"
 	"src/main.cpp"
 )

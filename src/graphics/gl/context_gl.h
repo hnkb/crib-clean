@@ -22,6 +22,9 @@ namespace crib::graphics::gl
 		virtual void on_resize(int2 dims) override;
 
 	private:
+		void draw_platform_independent();
+		void read_device_name(int swapInterval);
+
 #if defined(_WIN32)
 		HGLRC ctx = nullptr;
 #endif

@@ -3,7 +3,6 @@
 #include <crib/app>
 #include "../../graphics/gl/context_gl.h"
 #include <crib/platform/win>
-#include "../../graphics/gl/context_gl.h"
 
 using crib::app::window;
 
@@ -31,8 +30,7 @@ namespace
 					return TRUE;
 
 				case WM_PAINT:
-					if (wnd->context)
-						wnd->context->draw();
+					wnd->draw();
 					return 0;
 
 				case WM_DESTROY:
@@ -106,12 +104,7 @@ window::window(options opt)
 
 	SetWindowLongPtrW((HWND)impl, GWLP_USERDATA, LONG_PTR(this));
 
-	{
-		if (opt.prefer_engine == engine::any || opt.prefer_engine == engine::opengl)
-	context = new graphics::gl::context(*this);
-	if (context)
-		SetWindowTextW((HWND)impl, platform::win::wide_string(context->description));
-	}
+	create_graphics_context(opt);
 
 	ShowWindow((HWND)impl, SW_SHOWDEFAULT);
 

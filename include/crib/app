@@ -29,22 +29,15 @@ namespace crib::app
 		virtual ~window();
 
 		window(const window&) = delete;
-		window(window&& other) { *this = std::move(other); }
+		window(window&&);
 		window& operator=(const window&) = delete;
-		window& operator=(window&& other)
-		{
-			if (this != &other)
-			{
-				impl = other.impl;
-				context = other.context;
-				other.impl = nullptr;
-				other.context = nullptr;
-			}
-			return *this;
-		}
+		window& operator=(window&&);
 
 		options get_options() const;
 		window& set_options(const options&);
+
+		void create_graphics_context(options opt);
+		virtual void draw();
 
 		// protected:
 		virtual bool on_input() { return false; }

@@ -72,32 +72,7 @@ context::context(const app::window& window) : owner(window)
 	if (GLAD_WGL_EXT_swap_control_tear)
 		wglSwapIntervalEXT(-1);  // to enable adaptive sync
 
-
-	// set description
-	{
-		std::string profile;
-		{
-			GLint mask;
-			glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &mask);
-			if (mask & GL_CONTEXT_CORE_PROFILE_BIT)
-				profile = "Core";
-			else if (mask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT)
-				profile = "Compatibility";
-		}
-
-		std::string sync;
-		{
-			const int interval = wglGetSwapIntervalEXT();
-			if (interval == 1)
-				sync = " (V-Sync)";
-			else if (interval == -1)
-				sync = " (adaptive sync)";
-		}
-
-		description = std::string("GL ") + (char*)glGetString(GL_VERSION) + "  " + profile
-					  + "  GLSL " + (char*)glGetString(GL_SHADING_LANGUAGE_VERSION) + "  |  "
-					  + (char*)glGetString(GL_RENDERER) + sync;
-	}
+	read_device_name(wglGetSwapIntervalEXT());
 }
 
 context::~context()
@@ -112,8 +87,7 @@ void context::draw()
 	auto handle = (HWND)owner.impl;
 	auto hdc = BeginPaint(handle, &ps);
 
-	glClearColor(0.6f, 0.2f, 0.15f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	draw_platform_independent();
 
 	SwapBuffers(hdc);
 	EndPaint(handle, &ps);
