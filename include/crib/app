@@ -1,0 +1,81 @@
+
+#pragma once
+
+#include "math"
+#include <string>
+#include <memory>
+
+
+namespace crib::graphics
+{
+	class context;
+}
+
+namespace crib::app
+{
+
+	int run();
+
+
+	class window
+	{
+	public:
+		struct options;
+		enum class engine;
+
+		window();
+		window(options);
+
+		virtual ~window();
+
+		window(const window&) = delete;
+		window(window&& other) { *this = std::move(other); }
+		window& operator=(const window&) = delete;
+		window& operator=(window&& other)
+		{
+			if (this != &other)
+			{
+				impl = other.impl;
+				context = other.context;
+				other.impl = nullptr;
+				other.context = nullptr;
+			}
+			return *this;
+		}
+
+		options get_options() const;
+		window& set_options(const options&);
+
+		// protected:
+		virtual bool on_input() { return false; }
+
+		// private:
+		void* impl = nullptr;
+		graphics::context* context = nullptr;
+	};
+
+	struct window::options
+	{
+		std::string type_id;
+		std::string title;
+		int2 pos;
+		int2 size;
+		engine prefer_engine;
+		// TODO: anti-aliasing settings
+		// TODO: constant redraw or redraw on change?
+	};
+
+	enum class window::engine {
+		any,
+#if _WIN32
+		d3d11,
+		d3d12,
+#endif
+		opengl,
+		vulkan,
+#if __APPLE__
+		metal,
+#endif
+	};
+
+}
