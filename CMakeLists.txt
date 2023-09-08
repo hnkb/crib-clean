@@ -32,10 +32,14 @@ else()
 	target_sources(crib PRIVATE
 		"src/app/x/app_x.cpp"
 		"src/app/x/window_x.cpp"
+		"src/graphics/gl/gl_x.cpp"
 	)
 
 	find_package(X11 REQUIRED)
 	target_link_libraries(crib PRIVATE X11::X11)
+	
+	find_package(OpenGL REQUIRED)
+	target_link_libraries(crib PRIVATE OpenGL::OpenGL OpenGL::GLX)
 endif()
 
 target_compile_features(crib PUBLIC cxx_std_17)

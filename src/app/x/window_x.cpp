@@ -8,26 +8,39 @@ using namespace crib::platform;
 using crib::app::window;
 
 
-x11::window::window(const crib::app::window::options& opt)
+x11::window::window(crib::app::window& owner, const crib::app::window::options& opt)
+	: owner(owner)
 {
 	app::open();
 	auto& disp = app::display;
 
-	screen = DefaultScreen(disp);
+	pixel_format = glx::choose_pixel_format(disp);
+	auto vi = glXGetVisualFromFBConfig(disp, pixel_format);
 
-	const auto black = BlackPixel(disp, screen);
-	const auto white = WhitePixel(disp, screen);
+	// create color map
+	color_map = XCreateColormap(disp, RootWindow(disp, vi->screen), vi->visual, AllocNone);
 
-	wnd = XCreateSimpleWindow(
+	XSetWindowAttributes swa;
+	swa.colormap = color_map;
+	swa.background_pixmap = None;
+	swa.border_pixel = 0;
+	swa.event_mask = StructureNotifyMask;
+
+	wnd = XCreateWindow(
 		disp,
-		DefaultRootWindow(disp),
+		RootWindow(disp, vi->screen),
 		opt.pos.x,
 		opt.pos.y,
 		opt.size.x,
 		opt.size.y,
-		5,
-		white,
-		white);
+		0,
+		vi->depth,
+		InputOutput,
+		vi->visual,
+		CWBorderPixel | CWColormap | CWEventMask,
+		&swa);
+
+	XFree(vi);
 
 	if (!wnd)
 	{
@@ -47,11 +60,6 @@ x11::window::window(const crib::app::window::options& opt)
 
 	XSetWMProtocols(disp, wnd, &app::window_closed, 1);
 
-	gc = XCreateGC(disp, wnd, 0, nullptr);
-	XSetBackground(disp, gc, white);
-	XSetForeground(disp, gc, black);
-
-	XClearWindow(disp, wnd);
 	XMapRaised(disp, wnd);
 }
 
@@ -66,8 +74,8 @@ void x11::window::close()
 		return;
 	already_deleted = true;
 
-	XFreeGC(app::display, gc);
 	XDestroyWindow(app::display, wnd);
+	XFreeColormap(app::display, color_map);
 
 	app::close();
 }
@@ -79,6 +87,7 @@ void x11::window::proc(XEvent& event)
 	switch (event.type)
 	{
 		case Expose:
+			owner.draw();
 			break;
 
 		case KeyPress:
@@ -113,7 +122,16 @@ window::window(options opt)
 	if (opt.title.empty())
 		opt.title = "crib";
 
-	impl = new x11::window(opt);
+	impl = new x11::window(*this, opt);
+
+	create_graphics_context(opt);
+
+	if (context)
+	{
+		XWindowAttributes gwa;
+		XGetWindowAttributes(x11::app::display, ((x11::window*)impl)->wnd, &gwa);
+		context->on_resize({ gwa.width, gwa.height });
+	}
 }
 
 window::~window()
