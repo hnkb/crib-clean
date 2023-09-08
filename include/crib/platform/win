@@ -55,8 +55,6 @@ namespace crib::platform::win
 			throw error(code);
 	}
 
-	enum class window_message : UINT { closed = (WM_APP + 501), quit = (WM_APP + 502) };
-
 	class wide_string
 	{
 	public:
