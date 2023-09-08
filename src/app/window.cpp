@@ -10,18 +10,6 @@ window::window(window&& other)
 	*this = std::move(other);
 }
 
-window& window::operator=(window&& other)
-{
-	if (this != &other)
-	{
-		impl = other.impl;
-		context = other.context;
-		other.impl = nullptr;
-		other.context = nullptr;
-	}
-	return *this;
-}
-
 
 void window::create_graphics_context(options opt)
 {

@@ -6,12 +6,11 @@
 using crib::graphics::gl::context;
 
 
-context::context(const app::window& window) : owner(window)
+context::context(const app::window& window) : owner((HWND)window.impl)
 {
 	description = "OpenGL  |  no or unknown device";
 
-	auto handle = (HWND)owner.impl;
-	auto hdc = GetDC(handle);
+	auto hdc = GetDC(owner);
 
 	PIXELFORMATDESCRIPTOR pfd = {};
 	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
@@ -77,14 +76,14 @@ context::context(const app::window& window) : owner(window)
 
 context::~context()
 {
-	wglMakeCurrent(GetDC((HWND)owner.impl), nullptr);
+	wglMakeCurrent(GetDC(owner), nullptr);
 	wglDeleteContext(ctx);
 }
 
 void context::draw()
 {
 	PAINTSTRUCT ps;
-	auto handle = (HWND)owner.impl;
+	auto handle = owner;
 	auto hdc = BeginPaint(handle, &ps);
 
 	draw_platform_independent();
