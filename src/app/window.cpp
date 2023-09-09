@@ -44,6 +44,13 @@ void window::on_position_changed(int2 pos)
 
 void window::on_size_changed(int2 dims)
 {
+	// try
+	//{
 	if (context)
 		context->on_resize(dims);
+	//}
+	// catch (graphics::base::context_invalid e)
+	//{
+	//	create_graphics_context({});
+	//}
 }
