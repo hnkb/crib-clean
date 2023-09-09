@@ -36,6 +36,9 @@ namespace crib::platform::x11
 		GLXFBConfig pixel_format;
 
 		bool already_deleted = false;
+
+		int2 dims;
+		int2 pos;
 	};
 
 	namespace glx

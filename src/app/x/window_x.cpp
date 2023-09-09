@@ -62,6 +62,14 @@ x11::window::window(crib::app::window* owner, const crib::app::window::options& 
 	XSetWMProtocols(disp, wnd, &app::window_closed, 1);
 
 	XMapRaised(disp, wnd);
+
+	// store last known size and position
+	{
+		XWindowAttributes gwa;
+		XGetWindowAttributes(disp, wnd, &gwa);
+		dims = { gwa.width, gwa.height };
+		pos = { gwa.x, gwa.y };
+	}
 }
 
 x11::window::~window()
@@ -97,6 +105,22 @@ void x11::window::proc(XEvent& event)
 		case Expose:
 			owner->draw();
 			break;
+
+		case ConfigureNotify:
+		{
+			auto e = event.xconfigure;
+			if ((e.x != pos.x || e.y != pos.y) && e.x != 0 && e.y != 0)
+			{
+				pos = { e.x, e.y };
+				owner->on_position_changed(pos);
+			}
+			if (e.width != dims.x || e.height != dims.y)
+			{
+				dims = { e.width, e.height };
+				owner->on_size_changed(dims);
+			}
+		}
+		break;
 
 		case KeyPress:
 			break;
@@ -135,11 +159,7 @@ window::window(options opt)
 	create_graphics_context(opt);
 
 	if (context)
-	{
-		XWindowAttributes gwa;
-		XGetWindowAttributes(x11::app::display, ((x11::window*)impl)->wnd, &gwa);
-		context->on_resize({ gwa.width, gwa.height });
-	}
+		context->on_resize(((x11::window*)impl)->dims);
 }
 
 window::~window()

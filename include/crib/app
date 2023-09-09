@@ -43,6 +43,8 @@ namespace crib::app
 
 		// protected:
 		virtual bool on_input() { return false; }
+		virtual void on_position_changed(int2 pos);
+		virtual void on_size_changed(int2 dims);
 
 		// private:
 		void* impl = nullptr;

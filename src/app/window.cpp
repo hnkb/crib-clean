@@ -37,3 +37,13 @@ void window::draw()
 	if (context)
 		context->draw();
 }
+
+
+void window::on_position_changed(int2 pos)
+{}
+
+void window::on_size_changed(int2 dims)
+{
+	if (context)
+		context->on_resize(dims);
+}
