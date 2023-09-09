@@ -2,6 +2,7 @@
 #include "app_x.h"
 #include "../../graphics/gl/context_gl.h"
 #include <stdexcept>
+#include <cstring>
 
 using namespace crib::platform;
 
@@ -165,6 +166,20 @@ window& window::operator=(window&& other)
 			((platform::x11::window*)impl)->owner = this;
 	}
 	return *this;
+}
+
+
+void window::close()
+{
+	XEvent ev;
+	memset(&ev, 0, sizeof(ev));
+	ev.xclient.type = ClientMessage;
+	ev.xclient.window = ((x11::window*)impl)->wnd;
+	ev.xclient.message_type = XInternAtom(x11::app::display, "WM_PROTOCOLS", true);
+	ev.xclient.format = 32;
+	ev.xclient.data.l[0] = x11::app::window_closed;
+	ev.xclient.data.l[1] = CurrentTime;
+	XSendEvent(x11::app::display, ev.xclient.window, False, NoEventMask, &ev);
 }
 
 

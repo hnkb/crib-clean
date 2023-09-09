@@ -145,6 +145,12 @@ window& window::operator=(window&& other)
 }
 
 
+void window::close()
+{
+	DestroyWindow((HWND)impl);
+}
+
+
 window::options window::get_options() const
 {
 	return {};
