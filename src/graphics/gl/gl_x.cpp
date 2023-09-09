@@ -91,11 +91,9 @@ context::context(const app::window& window) : owner(*(x11::window*)window.impl)
 
 context::~context()
 {
+	glXMakeCurrent(x11::app::display, 0, 0);
 	if (ctx)
-	{
-		glXMakeCurrent(x11::app::display, 0, 0);
 		glXDestroyContext(x11::app::display, ctx);
-	}
 }
 
 void context::draw()

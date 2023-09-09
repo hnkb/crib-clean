@@ -66,10 +66,17 @@ x11::window::window(crib::app::window* owner, const crib::app::window::options& 
 x11::window::~window()
 {
 	close();
+	owner->impl = nullptr;
 }
 
 void x11::window::close()
 {
+	if (owner->context)
+	{
+		delete owner->context;
+		owner->context = nullptr;
+	}
+
 	if (already_deleted)
 		return;
 	already_deleted = true;
@@ -136,6 +143,11 @@ window::window(options opt)
 
 window::~window()
 {
+	if (context)
+	{
+		delete context;
+		context = nullptr;
+	}
 	if (impl)
 		delete (x11::window*)impl;
 }
@@ -149,7 +161,8 @@ window& window::operator=(window&& other)
 		other.impl = nullptr;
 		other.context = nullptr;
 
-		((platform::x11::window*)impl)->owner = this;
+		if (impl)
+			((platform::x11::window*)impl)->owner = this;
 	}
 	return *this;
 }

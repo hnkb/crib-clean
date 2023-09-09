@@ -13,6 +13,15 @@ window::window(window&& other)
 
 void window::create_graphics_context(options opt)
 {
+	if (context)
+	{
+		delete context;
+		context = nullptr;
+	}
+
+	if (!impl)
+		return;
+
 	if (opt.prefer_engine == engine::any || opt.prefer_engine == engine::opengl)
 		context = new graphics::gl::context(*this);
 
