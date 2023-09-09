@@ -6,44 +6,44 @@
 #include <string>
 
 
-namespace crib::platform::x11
+namespace Crib::Platform::X11
 {
 
-	namespace app
+	namespace App
 	{
 		void open();
 		void close();
 
 		extern Display* display;
-		extern Atom window_closed;
-		extern XContext window_class;
+		extern Atom windowClosed;
+		extern XContext windowClass;
 	}
 
-	class window
+	class Window
 	{
 	public:
-		window(crib::app::window* owner, const crib::app::window::options& opt);
-		~window();
+		Window(Crib::App::Window* owner, const Crib::App::Window::Options& opt);
+		~Window();
 
 		void proc(XEvent& event);
 		void close();
-		void set_title(const std::string& title);
+		void setTitle(const std::string& title);
 
-		crib::app::window* owner;
+		Crib::App::Window* owner;
 
 		::Window wnd;
-		Colormap color_map;
-		GLXFBConfig pixel_format;
+		Colormap colorMap;
+		GLXFBConfig pixelFormat;
 
-		bool already_deleted = false;
+		bool alreadyDeleted = false;
 
 		int2 dims;
 		int2 pos;
 	};
 
-	namespace glx
+	namespace GLX
 	{
-		GLXFBConfig choose_pixel_format(Display*);
+		GLXFBConfig choosePixelFormat(Display*);
 	}
 
 }

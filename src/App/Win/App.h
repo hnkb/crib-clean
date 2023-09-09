@@ -4,9 +4,9 @@
 #include <Crib/Platform/Win>
 
 
-namespace crib::platform::win
+namespace Crib::Platform::Win
 {
 
-	enum class window_message : UINT { closed = (WM_APP + 501), quit = (WM_APP + 502) };
+	enum class WindowMessage : UINT { closed = (WM_APP + 501), quit = (WM_APP + 502) };
 
 }

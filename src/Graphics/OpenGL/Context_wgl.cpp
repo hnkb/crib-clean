@@ -3,10 +3,10 @@
 #include <glad/glad_wgl.h>
 #include <VersionHelpers.h>
 
-using crib::graphics::gl::context;
+using Crib::Graphics::OpenGL::Context;
 
 
-context::context(const app::window& window) : owner((HWND)window.impl)
+Context::Context(const App::Window& window) : owner((HWND)window.impl)
 {
 	description = "OpenGL  |  no or unknown device";
 
@@ -71,22 +71,22 @@ context::context(const app::window& window) : owner((HWND)window.impl)
 	if (GLAD_WGL_EXT_swap_control_tear)
 		wglSwapIntervalEXT(-1);  // to enable adaptive sync
 
-	read_device_name(wglGetSwapIntervalEXT());
+	readDeviceDescription(wglGetSwapIntervalEXT());
 }
 
-context::~context()
+Context::~Context()
 {
 	wglMakeCurrent(GetDC(owner), nullptr);
 	wglDeleteContext(ctx);
 }
 
-void context::draw()
+void Context::draw()
 {
 	PAINTSTRUCT ps;
 	auto handle = owner;
 	auto hdc = BeginPaint(handle, &ps);
 
-	draw_platform_independent();
+	drawPlatformIndependent();
 
 	SwapBuffers(hdc);
 	EndPaint(handle, &ps);

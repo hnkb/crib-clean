@@ -3,20 +3,20 @@
 #include <Crib/App>
 
 
-class myWindow : public crib::app::window
+class MyWindow : public Crib::App::Window
 {
 public:
-	void on_size_changed(int2 dims) override
+	void onSizeChanged(int2 dims) override
 	{
-		window::on_size_changed(dims);
+		Window::onSizeChanged(dims);
 		printf("size\n");
 	}
-	void on_position_changed(int2 pos) override
+	void onPositionChanged(int2 pos) override
 	{
-		window::on_position_changed(pos);
+		Window::onPositionChanged(pos);
 		printf("move\n");
 	}
-	void on_key_char(const std::string& str) override
+	void onKeyChar(const std::string& str) override
 	{
 		if (str[0] == 27)  // Escape
 		{
@@ -37,21 +37,21 @@ public:
 		{
 			opt.title += str;
 		}
-		set_options(opt);
+		setOptions(opt);
 	}
 
 private:
-	options opt;
+	Options opt;
 };
 
 int main()
 {
 	try
 	{
-		//crib::app::window win;
-		myWindow win2;
+		//Crib::App::Window win;
+		MyWindow win2;
 		auto win = std::move(win2);
-		return crib::app::run();
+		return Crib::App::run();
 	}
 	catch (std::exception& ex)
 	{

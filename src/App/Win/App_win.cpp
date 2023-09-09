@@ -3,7 +3,7 @@
 #include <Crib/App>
 
 
-int crib::app::run()
+int Crib::App::run()
 {
 	MSG msg;
 
@@ -11,15 +11,15 @@ int crib::app::run()
 			GetCurrentThreadId(),
 			[](HWND, LPARAM) { return FALSE; },
 			0))
-		throw std::logic_error("[crib::application::run] At least one window is required.");
+		throw std::logic_error("[Crib::Application::run] At least one window is required.");
 
 	while (GetMessageW(&msg, nullptr, 0, 0))
 	{
 		TranslateMessage(&msg);
 		DispatchMessageW(&msg);
 
-		if ((msg.message == (UINT)platform::win::window_message::quit)
-			|| (msg.message == (UINT)platform::win::window_message::closed
+		if ((msg.message == (UINT)Platform::Win::WindowMessage::quit)
+			|| (msg.message == (UINT)Platform::Win::WindowMessage::closed
 				&& EnumThreadWindows(
 					GetCurrentThreadId(),
 					[](HWND, LPARAM) { return FALSE; },

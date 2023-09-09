@@ -20,28 +20,28 @@
 #include <Windows.h>
 
 
-namespace crib::platform::win
+namespace Crib::Platform::Win
 {
 
-	class initialize_com
+	class InitializeCOM
 	{
 	public:
-		initialize_com();
-		initialize_com(const DWORD concurrency_model);
-		~initialize_com();
+		InitializeCOM();
+		InitializeCOM(const DWORD concurrency_model);
+		~InitializeCOM();
 
 	private:
-		bool must_shutdown;
+		bool mustShutdown;
 	};
 
 
-	class error : public std::system_error
+	class Error : public std::system_error
 	{
 	public:
-		error(std::error_code code);
-		error(HRESULT code) : error({ code, std::system_category() }) {}
-		error(DWORD code) : error(std::error_code(code, std::system_category())) {}
-		error() : error(GetLastError()) {}
+		Error(std::error_code code);
+		Error(HRESULT code) : Error({ code, std::system_category() }) {}
+		Error(DWORD code) : Error(std::error_code(code, std::system_category())) {}
+		Error() : Error(GetLastError()) {}
 
 		const char* what() const noexcept override { return message.c_str(); }
 
@@ -49,18 +49,18 @@ namespace crib::platform::win
 		std::string message;
 	};
 
-	inline void throw_on_error /*throwOnError*/ (HRESULT code, const char* hint = nullptr)
+	inline void throwOnError(HRESULT code, const char* hint = nullptr)
 	{
 		if (FAILED(code))
-			throw error(code);
+			throw Error(code);
 	}
 
-	class wide_string
+	class WideString
 	{
 	public:
-		wide_string() : wide_string(1023) {}
+		WideString() : WideString(1023) {}
 
-		explicit wide_string(const size_t maxStringLength) : utf16(maxStringLength + 1)
+		explicit WideString(const size_t maxStringLength) : utf16(maxStringLength + 1)
 		{
 			utf16.back() = utf16.front() = 0;
 		}
@@ -76,26 +76,26 @@ namespace crib::platform::win
 		int length() const;
 
 		// conversion from UTF-8
-		wide_string(std::string_view utf8) { *this = utf8; }
-		wide_string(const std::string& utf8) { *this = std::string_view(utf8); }
-		wide_string(const char* utf8) { *this = std::string_view(utf8); }
+		WideString(std::string_view utf8) { *this = utf8; }
+		WideString(const std::string& utf8) { *this = std::string_view(utf8); }
+		WideString(const char* utf8) { *this = std::string_view(utf8); }
 
-		wide_string& operator=(std::string_view utf8);
+		WideString& operator=(std::string_view utf8);
 
 #if defined(__cpp_char8_t)
-		wide_string(std::u8string_view utf8) { *this = utf8; }
-		wide_string(const std::u8string& utf8) { *this = std::u8string_view(utf8); }
-		wide_string(const char8_t* utf8) { *this = std::u8string_view(utf8); }
+		WideString(std::u8string_view utf8) { *this = utf8; }
+		WideString(const std::u8string& utf8) { *this = std::u8string_view(utf8); }
+		WideString(const char8_t* utf8) { *this = std::u8string_view(utf8); }
 
-		wide_string& operator=(std::u8string_view utf8)
+		WideString& operator=(std::u8string_view utf8)
 		{
 			return *this = std::string_view((char*)utf8.data(), utf8.size());
 		}
 #endif
 
 		// conversion to UTF-8
-		operator std::string() const { return to_utf8(utf16.data()); }
-		static std::string to_utf8(const wchar_t* utf16);
+		operator std::string() const { return utf8(utf16.data()); }
+		static std::string utf8(const wchar_t* utf16);
 
 	private:
 		std::vector<wchar_t> utf16;

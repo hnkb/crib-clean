@@ -41,7 +41,7 @@ namespace
 #endif
 
 
-crib::platform::win::error::error(std::error_code code) : system_error(std::move(code))
+Crib::Platform::Win::Error::Error(std::error_code code) : system_error(std::move(code))
 {
 #if defined(__MINGW32__)
 	message = getWindowsErrorMessage(code().value());

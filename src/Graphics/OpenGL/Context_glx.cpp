@@ -3,9 +3,9 @@
 #include "../../App/Xlib/App.h"
 #include <stdexcept>
 
-using namespace crib::platform;
+using namespace Crib::Platform;
 
-using crib::graphics::gl::context;
+using Crib::Graphics::OpenGL::Context;
 
 
 namespace
@@ -18,12 +18,12 @@ namespace
 	}
 }
 
-context::context(const app::window& window) : owner(*(x11::window*)window.impl)
+Context::Context(const App::Window& window) : owner(*(X11::Window*)window.impl)
 {
 	description = "OpenGL  |  no or unknown device";
 
-	auto& disp = x11::app::display;
-	auto& fbc = owner.pixel_format;
+	auto& disp = X11::App::display;
+	auto& fbc = owner.pixelFormat;
 
 	if (!GLAD_GLX_ARB_create_context || !GLAD_GLX_ARB_create_context_profile)
 	{
@@ -86,27 +86,27 @@ context::context(const app::window& window) : owner(*(x11::window*)window.impl)
 
 	GLuint interval;
 	glXQueryDrawable(disp, glXGetCurrentDrawable(), GLX_SWAP_INTERVAL_EXT, &interval);
-	read_device_name(interval);
+	readDeviceDescription(interval);
 }
 
-context::~context()
+Context::~Context()
 {
-	glXMakeCurrent(x11::app::display, 0, 0);
+	glXMakeCurrent(X11::App::display, 0, 0);
 	if (ctx)
-		glXDestroyContext(x11::app::display, ctx);
+		glXDestroyContext(X11::App::display, ctx);
 }
 
-void context::draw()
+void Context::draw()
 {
 	if (ctx)
 	{
-		draw_platform_independent();
-		glXSwapBuffers(x11::app::display, owner.wnd);
+		drawPlatformIndependent();
+		glXSwapBuffers(X11::App::display, owner.wnd);
 	}
 }
 
 
-GLXFBConfig x11::glx::choose_pixel_format(Display* disp)
+GLXFBConfig X11::GLX::choosePixelFormat(Display* disp)
 {
 	if (!gladLoadGLX(disp, DefaultScreen(disp)))
 		throw std::runtime_error("Unable to load OpenGL");

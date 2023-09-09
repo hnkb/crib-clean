@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <vector>
 
-using crib::graphics::gl::context;
+using Crib::Graphics::OpenGL::Context;
 
 
 GLuint theProgram = 0;
@@ -135,12 +135,12 @@ void initGL_3()
 }
 
 
-void context::on_resize(int2 dims)
+void Context::onResize(int2 dims)
 {
 	glViewport(0, 0, dims.x, dims.y);
 }
 
-void context::read_device_name(int swapInterval)
+void Context::readDeviceDescription(int swapInterval)
 {
 	std::string profile;
 	{
@@ -165,7 +165,7 @@ void context::read_device_name(int swapInterval)
 				  + (char*)glGetString(GL_RENDERER) + sync;
 }
 
-void context::draw_platform_independent()
+void Context::drawPlatformIndependent()
 {
 	glClearColor(0.6f, 0.2f, 0.15f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);

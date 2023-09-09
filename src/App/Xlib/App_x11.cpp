@@ -2,12 +2,12 @@
 #include "App.h"
 #include <stdexcept>
 
-using namespace crib::platform;
+using namespace Crib::Platform;
 
 
-Display* x11::app::display = nullptr;
-Atom x11::app::window_closed;
-XContext x11::app::window_class;
+Display* X11::App::display = nullptr;
+Atom X11::App::windowClosed;
+XContext X11::App::windowClass;
 
 namespace
 {
@@ -15,7 +15,7 @@ namespace
 }
 
 
-void x11::app::open()
+void X11::App::open()
 {
 	if (numOpenConnections++ == 0)
 	{
@@ -24,11 +24,11 @@ void x11::app::open()
 		if (!display)
 			throw std::runtime_error("unable to open X11 display server");
 
-		window_closed = XInternAtom(display, "WM_DELETE_WINDOW", false);
+		windowClosed = XInternAtom(display, "WM_DELETE_WINDOW", false);
 	}
 }
 
-void x11::app::close()
+void X11::App::close()
 {
 	if (--numOpenConnections == 0)
 	{
@@ -37,9 +37,9 @@ void x11::app::close()
 	}
 }
 
-int crib::app::run()
+int Crib::App::run()
 {
-	auto& disp = x11::app::display;
+	auto& disp = X11::App::display;
 
 	while (true)
 	{
@@ -47,15 +47,15 @@ int crib::app::run()
 		XNextEvent(disp, &event);
 
 		XPointer ptr;
-		XFindContext(disp, event.xany.window, x11::app::window_class, &ptr);
+		XFindContext(disp, event.xany.window, X11::App::windowClass, &ptr);
 
 		if (event.type == ClientMessage
-			&& event.xclient.data.l[0] == (long)x11::app::window_closed)
+			&& event.xclient.data.l[0] == (long)X11::App::windowClosed)
 		{
 			if (ptr)
 			{
-				// TODO: also call window::proc() with some close/destroy message
-				((x11::window*)ptr)->close();
+				// TODO: also call Window::proc() with some close/destroy message
+				((X11::Window*)ptr)->close();
 			}
 
 			if (numOpenConnections < 1)
@@ -63,7 +63,7 @@ int crib::app::run()
 		}
 		else if (ptr)
 		{
-			((x11::window*)ptr)->proc(event);
+			((X11::Window*)ptr)->proc(event);
 		}
 	}
 }

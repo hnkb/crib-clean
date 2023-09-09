@@ -4,25 +4,24 @@
 #include <stdexcept>
 #include <cstring>
 
-using namespace crib::platform;
+using namespace Crib;
+using namespace Crib::Platform;
 
-using crib::app::window;
 
-
-x11::window::window(crib::app::window* owner, const crib::app::window::options& opt)
+X11::Window::Window(Crib::App::Window* owner, const Crib::App::Window::Options& opt)
 	: owner(owner)
 {
-	app::open();
-	auto& disp = app::display;
+	App::open();
+	auto& disp = App::display;
 
-	pixel_format = glx::choose_pixel_format(disp);
-	auto vi = glXGetVisualFromFBConfig(disp, pixel_format);
+	pixelFormat = GLX::choosePixelFormat(disp);
+	auto vi = glXGetVisualFromFBConfig(disp, pixelFormat);
 
 	// create color map
-	color_map = XCreateColormap(disp, RootWindow(disp, vi->screen), vi->visual, AllocNone);
+	colorMap = XCreateColormap(disp, RootWindow(disp, vi->screen), vi->visual, AllocNone);
 
 	XSetWindowAttributes swa;
-	swa.colormap = color_map;
+	swa.colormap = colorMap;
 	swa.background_pixmap = None;
 	swa.border_pixel = 0;
 	swa.event_mask = StructureNotifyMask;
@@ -52,14 +51,14 @@ x11::window::window(crib::app::window* owner, const crib::app::window::options& 
 
 	XStoreName(disp, wnd, opt.title.c_str());
 
-	XSaveContext(disp, wnd, app::window_class, (XPointer)this);
+	XSaveContext(disp, wnd, App::windowClass, (XPointer)this);
 
 	XSelectInput(
 		disp,
 		wnd,
 		StructureNotifyMask | ExposureMask | ButtonPressMask | KeyPressMask);
 
-	XSetWMProtocols(disp, wnd, &app::window_closed, 1);
+	XSetWMProtocols(disp, wnd, &App::windowClosed, 1);
 
 	XMapRaised(disp, wnd);
 
@@ -72,13 +71,13 @@ x11::window::window(crib::app::window* owner, const crib::app::window::options& 
 	}
 }
 
-x11::window::~window()
+X11::Window::~Window()
 {
 	close();
 	owner->impl = nullptr;
 }
 
-void x11::window::close()
+void X11::Window::close()
 {
 	if (owner->context)
 	{
@@ -86,19 +85,19 @@ void x11::window::close()
 		owner->context = nullptr;
 	}
 
-	if (already_deleted)
+	if (alreadyDeleted)
 		return;
-	already_deleted = true;
+	alreadyDeleted = true;
 
-	XDestroyWindow(app::display, wnd);
-	XFreeColormap(app::display, color_map);
+	XDestroyWindow(App::display, wnd);
+	XFreeColormap(App::display, colorMap);
 
-	app::close();
+	App::close();
 }
 
-void x11::window::proc(XEvent& event)
+void X11::Window::proc(XEvent& event)
 {
-	auto& disp = app::display;
+	auto& disp = App::display;
 
 	switch (event.type)
 	{
@@ -112,12 +111,12 @@ void x11::window::proc(XEvent& event)
 			if ((e.x != pos.x || e.y != pos.y) && e.x != 0 && e.y != 0)
 			{
 				pos = { e.x, e.y };
-				owner->on_position_changed(pos);
+				owner->onPositionChanged(pos);
 			}
 			if (e.width != dims.x || e.height != dims.y)
 			{
 				dims = { e.width, e.height };
-				owner->on_size_changed(dims);
+				owner->onSizeChanged(dims);
 			}
 		}
 		break;
@@ -130,7 +129,7 @@ void x11::window::proc(XEvent& event)
 			// see example: https://gist.github.com/baines/5a49f1334281b2685af5dcae81a6fa8a
 			auto len = XLookupString(&event.xkey, str, sizeof(str), &key, 0);
 			if (len > 0)
-				owner->on_key_char(std::string(str, len));
+				owner->onKeyChar(std::string(str, len));
 		}
 		break;
 
@@ -140,9 +139,9 @@ void x11::window::proc(XEvent& event)
 			// numPress++;
 			// if (owner.context)
 			// {
-			// 	dynamic_cast<graphics::gl::context*>(owner.context)->bkg = colors[numPress % 5];
+			// 	dynamic_cast<Graphics::gl::context*>(owner.context)->bkg = colors[numPress % 5];
 			// 	// owner.context->draw();
-			// 	XClearArea(app::display, wnd, 0, 0, 0, 0, True);
+			// 	XClearArea(App::display, wnd, 0, 0, 0, 0, True);
 			// }
 		}
 			printf("Don't click mouse button!\n");
@@ -153,16 +152,16 @@ void x11::window::proc(XEvent& event)
 	}
 }
 
-void x11::window::set_title(const std::string& title)
+void X11::Window::setTitle(const std::string& title)
 {
-	XStoreName(app::display, wnd, title.c_str());
+	XStoreName(App::display, wnd, title.c_str());
 }
 
 
-window::window() : window(options {})
+App::Window::Window() : Window(Options {})
 {}
 
-window::window(options opt)
+App::Window::Window(Options opt)
 {
 	if (opt.size.x <= 0)
 	{
@@ -172,17 +171,17 @@ window::window(options opt)
 	opt.pos.x = std::max(0, opt.pos.x);
 	opt.pos.y = std::max(0, opt.pos.y);
 	if (opt.title.empty())
-		opt.title = "crib";
+		opt.title = "Crib";
 
-	impl = new x11::window(this, opt);
+	impl = new X11::Window(this, opt);
 
-	create_graphics_context(opt);
+	createGraphicsContext(opt);
 
 	if (context)
-		context->on_resize(((x11::window*)impl)->dims);
+		context->onResize(((X11::Window*)impl)->dims);
 }
 
-window::~window()
+App::Window::~Window()
 {
 	if (context)
 	{
@@ -190,10 +189,10 @@ window::~window()
 		context = nullptr;
 	}
 	if (impl)
-		delete (x11::window*)impl;
+		delete (X11::Window*)impl;
 }
 
-window& window::operator=(window&& other)
+App::Window& App::Window::operator=(Window&& other)
 {
 	if (this != &other)
 	{
@@ -203,34 +202,34 @@ window& window::operator=(window&& other)
 		other.context = nullptr;
 
 		if (impl)
-			((platform::x11::window*)impl)->owner = this;
+			((Platform::X11::Window*)impl)->owner = this;
 	}
 	return *this;
 }
 
 
-void window::close()
+void App::Window::close()
 {
 	XEvent ev;
 	memset(&ev, 0, sizeof(ev));
 	ev.xclient.type = ClientMessage;
-	ev.xclient.window = ((x11::window*)impl)->wnd;
-	ev.xclient.message_type = XInternAtom(x11::app::display, "WM_PROTOCOLS", true);
+	ev.xclient.window = ((X11::Window*)impl)->wnd;
+	ev.xclient.message_type = XInternAtom(X11::App::display, "WM_PROTOCOLS", true);
 	ev.xclient.format = 32;
-	ev.xclient.data.l[0] = x11::app::window_closed;
+	ev.xclient.data.l[0] = X11::App::windowClosed;
 	ev.xclient.data.l[1] = CurrentTime;
-	XSendEvent(x11::app::display, ev.xclient.window, False, NoEventMask, &ev);
+	XSendEvent(X11::App::display, ev.xclient.window, False, NoEventMask, &ev);
 }
 
 
-window::options window::get_options() const
+App::Window::Options App::Window::getOptions() const
 {
 	return {};
 }
 
-window& window::set_options(const options& opt)
+App::Window& App::Window::setOptions(const Options& opt)
 {
 	if (impl)
-		((x11::window*)impl)->set_title(opt.title);
+		((X11::Window*)impl)->setTitle(opt.title);
 	return *this;
 }

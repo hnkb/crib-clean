@@ -2,16 +2,16 @@
 #include <Crib/App>
 #include "../Graphics/OpenGL/Context.h"
 
-using crib::app::window;
+using namespace Crib;
 
 
-window::window(window&& other)
+App::Window::Window(Window&& other)
 {
 	*this = std::move(other);
 }
 
 
-void window::create_graphics_context(options opt)
+void App::Window::createGraphicsContext(Options opt)
 {
 	if (context)
 	{
@@ -22,35 +22,35 @@ void window::create_graphics_context(options opt)
 	if (!impl)
 		return;
 
-	if (opt.prefer_engine == engine::any || opt.prefer_engine == engine::opengl)
-		context = new graphics::gl::context(*this);
+	if (opt.preferEngine == Engine::any || opt.preferEngine == Engine::openGL)
+		context = new Graphics::OpenGL::Context(*this);
 
 	if (context)
 	{
 		opt.title = context->description;
-		set_options(opt);
+		setOptions(opt);
 	}
 }
 
-void window::draw()
+void App::Window::draw()
 {
 	if (context)
 		context->draw();
 }
 
 
-void window::on_position_changed(int2 pos)
+void App::Window::onPositionChanged(int2 pos)
 {}
 
-void window::on_size_changed(int2 dims)
+void App::Window::onSizeChanged(int2 dims)
 {
 	// try
 	//{
 	if (context)
-		context->on_resize(dims);
+		context->onResize(dims);
 	//}
-	// catch (graphics::base::context_invalid e)
+	// catch (Graphics::base::context_invalid e)
 	//{
-	//	create_graphics_context({});
+	//	createGraphicsContext({});
 	//}
 }

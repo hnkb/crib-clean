@@ -2,29 +2,29 @@
 #include <Crib/Platform/Win>
 #include <objbase.h>
 
-using namespace crib::platform::win;
+using namespace Crib::Platform::Win;
 
 
-initialize_com::initialize_com() : initialize_com(COINIT_MULTITHREADED)
+InitializeCOM::InitializeCOM() : InitializeCOM(COINIT_MULTITHREADED)
 {}
 
-initialize_com::initialize_com(const DWORD concurrency_model)
+InitializeCOM::InitializeCOM(const DWORD concurrencyModel)
 {
 	// If CoInitializeEx fails, but only because COM has already been initialized with a
 	// different concurrency model, we don't want to throw an exception, because COM is
 	// available. The only difference is, in that case we don't want to uninitialize in
 	// destructor.
 
-	const auto error_code = CoInitializeEx(nullptr, concurrency_model);
+	const auto errorCode = CoInitializeEx(nullptr, concurrencyModel);
 
-	must_shutdown = SUCCEEDED(error_code);
+	mustShutdown = SUCCEEDED(errorCode);
 
-	if (!must_shutdown && error_code != RPC_E_CHANGED_MODE)
-		throw error(error_code);  //, "initializing COM");
+	if (!mustShutdown && errorCode != RPC_E_CHANGED_MODE)
+		throw Error(errorCode);  //, "initializing COM");
 }
 
-initialize_com::~initialize_com()
+InitializeCOM::~InitializeCOM()
 {
-	if (must_shutdown)
+	if (mustShutdown)
 		CoUninitialize();
 }

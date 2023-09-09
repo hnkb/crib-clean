@@ -2,12 +2,12 @@
 #include <Crib/Platform/Win>
 #include <strsafe.h>
 
-using namespace crib::platform::win;
+using namespace Crib::Platform::Win;
 
 
 
-// wide_string& wide_string::operator=(const std::string& utf8)
-wide_string& wide_string::operator=(std::string_view utf8)
+// WideString& WideString::operator=(const std::string& utf8)
+WideString& WideString::operator=(std::string_view utf8)
 {
 	// if (utf8.empty())
 	//{
@@ -26,7 +26,7 @@ wide_string& wide_string::operator=(std::string_view utf8)
 			0);
 
 		if (buffer_size == 0)
-			throw error();
+			throw Error();
 
 		utf16.resize((size_t)buffer_size);
 
@@ -43,7 +43,7 @@ wide_string& wide_string::operator=(std::string_view utf8)
 }
 
 
-std::string wide_string::to_utf8(const wchar_t* utf16)
+std::string WideString::utf8(const wchar_t* utf16)
 {
 	// we either have size (like when FormatMessageW returns size, or when using
 	// std::wstring)
@@ -56,7 +56,7 @@ std::string wide_string::to_utf8(const wchar_t* utf16)
 	auto buffer_size = WideCharToMultiByte(CP_UTF8, 0, utf16, -1, nullptr, 0, nullptr, nullptr);
 
 	if (buffer_size == 0 && *utf16 != 0)
-		throw error();
+		throw Error();
 
 	std::string utf8(
 		(size_t)buffer_size - 1,
@@ -76,11 +76,11 @@ std::string wide_string::to_utf8(const wchar_t* utf16)
 }
 
 
-int wide_string::length() const
+int WideString::length() const
 {
 	size_t len = 0;
 
-	throw_on_error(StringCchLengthW(utf16.data(), utf16.size(), &len));
+	throwOnError(StringCchLengthW(utf16.data(), utf16.size(), &len));
 
 	return (int)len;
 }

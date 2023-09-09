@@ -11,30 +11,30 @@
 #elif defined(__unix__)
 #	include <glad/glad_glx.h>
 #	define PLATFORM_GL_CONTEXT GLXContext
-#	define PLATFORM_OWNER_TYPE crib::platform::x11::window&
+#	define PLATFORM_OWNER_TYPE Crib::Platform::X11::Window&
 
-namespace crib::platform::x11
+namespace Crib::Platform::X11
 {
-	class window;
+	class Window;
 }
 #endif
 
 
-namespace crib::graphics::gl
+namespace Crib::Graphics::OpenGL
 {
 
-	class context : public graphics::context
+	class Context : public Graphics::Context
 	{
 	public:
-		context(const app::window&);
-		virtual ~context();
+		Context(const App::Window&);
+		virtual ~Context();
 
 		virtual void draw() override;
-		virtual void on_resize(int2 dims) override;
+		virtual void onResize(int2 dims) override;
 
 	private:
-		void draw_platform_independent();
-		void read_device_name(int swapInterval);
+		void drawPlatformIndependent();
+		void readDeviceDescription(int swapInterval);
 
 		PLATFORM_GL_CONTEXT ctx = nullptr;
 		PLATFORM_OWNER_TYPE owner;

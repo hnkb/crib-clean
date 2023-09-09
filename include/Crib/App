@@ -6,70 +6,70 @@
 #include <memory>
 
 
-namespace crib::graphics
+namespace Crib::Graphics
 {
-	class context;
+	class Context;
 }
 
-namespace crib::app
+namespace Crib::App
 {
 
 	int run();
 
 
-	class window
+	class Window
 	{
 	public:
-		struct options;
-		enum class engine;
+		struct Options;
+		enum class Engine;
 
-		window();
-		window(options);
+		Window();
+		Window(Options);
 
-		virtual ~window();
+		virtual ~Window();
 
-		window(const window&) = delete;
-		window(window&&);
-		window& operator=(const window&) = delete;
-		window& operator=(window&&);
+		Window(const Window&) = delete;
+		Window(Window&&);
+		Window& operator=(const Window&) = delete;
+		Window& operator=(Window&&);
 
-		options get_options() const;
-		window& set_options(const options&);
+		Options getOptions() const;
+		Window& setOptions(const Options&);
 
 		void close();
 
-		void create_graphics_context(options opt);
+		void createGraphicsContext(Options opt);
 		virtual void draw();
 
 		// protected:
-		virtual bool on_input() { return false; }
-		virtual void on_key_char(const std::string& text) {}
-		virtual void on_position_changed(int2 pos);
-		virtual void on_size_changed(int2 dims);
+		virtual bool onInput() { return false; }
+		virtual void onKeyChar(const std::string& text) {}
+		virtual void onPositionChanged(int2 pos);
+		virtual void onSizeChanged(int2 dims);
 
 		// private:
 		void* impl = nullptr;
-		graphics::context* context = nullptr;
+		Graphics::Context* context = nullptr;
 	};
 
-	struct window::options
+	struct Window::Options
 	{
-		std::string type_id;
+		std::string typeId;
 		std::string title;
 		int2 pos;
 		int2 size;
-		engine prefer_engine;
+		Engine preferEngine;
 		// TODO: anti-aliasing settings
 		// TODO: constant redraw or redraw on change?
 	};
 
-	enum class window::engine {
+	enum class Window::Engine {
 		any,
 #if _WIN32
 		d3d11,
 		d3d12,
 #endif
-		opengl,
+		openGL,
 		vulkan,
 #if __APPLE__
 		metal,
