@@ -1,5 +1,5 @@
 
-#include <crib/platform/win>
+#include <Crib/Platform/Win>
 
 
 // Unfortunately, MinGW std::system_category() does not correctly report Windows error messages,

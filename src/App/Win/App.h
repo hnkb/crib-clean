@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <crib/platform/win>
+#include <Crib/Platform/Win>
 
 
 namespace crib::platform::win

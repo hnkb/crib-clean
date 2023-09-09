@@ -1,5 +1,5 @@
 
-#include <crib/app>
+#include <Crib/App>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <glad/glad_glx.h>

@@ -7,19 +7,19 @@ project(crib
 )
 
 add_executable(crib
-	"src/app/window.cpp"
-	"src/graphics/gl/context_gl.cpp"
+	"src/App/Window.cpp"
+	"src/Graphics/OpenGL/Context_gl.cpp"
 	"src/main.cpp"
 )
 
 if (WIN32)
 	target_sources(crib PRIVATE
-		"src/app/win/app_win.cpp"
-		"src/app/win/com.cpp"
-		"src/app/win/error_win.cpp"
-		"src/app/win/string_win.cpp"
-		"src/app/win/window_win.cpp"
-		"src/graphics/gl/gl_win.cpp"
+		"src/App/Win/app_win.cpp"
+		"src/App/Win/window_win.cpp"
+		"src/Graphics/OpenGL/Context_wgl.cpp"
+		"src/Platform/Win/COM.cpp"
+		"src/Platform/Win/Error_win.cpp"
+		"src/Platform/Win/String_win.cpp"
 	)
 
 	target_link_libraries(crib PRIVATE opengl32)
@@ -30,9 +30,9 @@ else()
 	#target_compile_options(crib PRIVATE -mavx -Wall -Wextra -pedantic -Werror)
 
 	target_sources(crib PRIVATE
-		"src/app/x/app_x.cpp"
-		"src/app/x/window_x.cpp"
-		"src/graphics/gl/gl_x.cpp"
+		"src/App/Xlib/App_x11.cpp"
+		"src/App/Xlib/Window_x11.cpp"
+		"src/Graphics/OpenGL/Context_glx.cpp"
 	)
 
 	find_package(X11 REQUIRED)

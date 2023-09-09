@@ -1,8 +1,8 @@
 
-#include "app_win.h"
-#include <crib/app>
-#include "../../graphics/gl/context_gl.h"
-#include <crib/platform/win>
+#include "App.h"
+#include <Crib/App>
+#include "../../Graphics/OpenGL/Context.h"
+#include <Crib/Platform/Win>
 
 using crib::app::window;
 

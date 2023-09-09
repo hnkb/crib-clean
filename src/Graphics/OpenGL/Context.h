@@ -1,11 +1,11 @@
 
 #pragma once
 
-#include <crib/graphics>
-#include <crib/app>
+#include <Crib/Graphics>
+#include <Crib/App>
 
 #if defined(_WIN32)
-#	include <crib/platform/win>
+#	include <Crib/Platform/Win>
 #	define PLATFORM_GL_CONTEXT HGLRC
 #	define PLATFORM_OWNER_TYPE HWND
 #elif defined(__unix__)

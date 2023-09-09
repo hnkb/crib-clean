@@ -1,6 +1,6 @@
 
-#include "context_gl.h"
-#include "../../app/x/app_x.h"
+#include "Context.h"
+#include "../../App/Xlib/App.h"
 #include <stdexcept>
 
 using namespace crib::platform;

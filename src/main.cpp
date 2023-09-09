@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include <crib/app>
+#include <Crib/App>
 
 
 class myWindow : public crib::app::window

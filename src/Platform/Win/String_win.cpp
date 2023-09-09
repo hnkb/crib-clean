@@ -1,5 +1,5 @@
 
-#include <crib/platform/win>
+#include <Crib/Platform/Win>
 #include <strsafe.h>
 
 using namespace crib::platform::win;

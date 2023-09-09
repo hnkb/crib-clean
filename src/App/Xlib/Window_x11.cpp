@@ -1,6 +1,6 @@
 
-#include "app_x.h"
-#include "../../graphics/gl/context_gl.h"
+#include "App.h"
+#include "../../Graphics/OpenGL/Context.h"
 #include <stdexcept>
 #include <cstring>
 

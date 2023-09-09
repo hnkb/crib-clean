@@ -1,6 +1,6 @@
 
-#include <crib/app>
-#include "../graphics/gl/context_gl.h"
+#include <Crib/App>
+#include "../Graphics/OpenGL/Context.h"
 
 using crib::app::window;
 

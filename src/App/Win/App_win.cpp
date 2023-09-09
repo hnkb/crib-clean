@@ -1,6 +1,6 @@
 
-#include "app_win.h"
-#include <crib/app>
+#include "App.h"
+#include <Crib/App>
 
 
 int crib::app::run()
