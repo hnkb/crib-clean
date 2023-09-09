@@ -18,6 +18,23 @@ namespace
 		{
 			switch (message)
 			{
+				case WM_CHAR:
+				{
+					crib::platform::win::wide_string buffer(4);
+					memset((wchar_t*)buffer, 0, sizeof(wchar_t) * buffer.capacity());
+					buffer[0] = (wchar_t)wParam;
+
+					if (IS_HIGH_SURROGATE(wParam))
+					{
+						MSG next;
+						if (PeekMessageW(&next, handle, WM_CHAR, WM_CHAR, TRUE)
+							&& IS_LOW_SURROGATE(next.wParam))
+							buffer[1] = (wchar_t)next.wParam;
+					}
+					wnd->on_key_char(buffer);
+					return 0;
+				}
+
 				case WM_MOVE:
 				{
 					RECT rect;

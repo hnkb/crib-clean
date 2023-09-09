@@ -123,7 +123,14 @@ void x11::window::proc(XEvent& event)
 		break;
 
 		case KeyPress:
-			break;
+		{
+			KeySym key;
+			char str[255];
+			auto len = XLookupString(&event.xkey, str, sizeof(str), &key, 0);
+			if (len > 0)
+				owner->on_key_char(std::string(str, len));
+		}
+		break;
 
 		case ButtonPress:
 			break;

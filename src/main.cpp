@@ -16,6 +16,32 @@ public:
 		window::on_position_changed(pos);
 		printf("move\n");
 	}
+	void on_key_char(const std::string& str) override
+	{
+		if (str[0] == 27)  // Escape
+		{
+			if (opt.title.empty())
+				close();
+			else
+				opt.title.clear();
+		}
+		else if (str[0] == 8)  // Backspace
+		{
+			// remove all UTF-8 continuation bytes
+			while (opt.title.size() && (opt.title.back() & 0xc0) == 0x80)
+				opt.title.pop_back();
+			if (opt.title.size())
+				opt.title.pop_back();
+		}
+		else
+		{
+			opt.title += str;
+		}
+		set_options(opt);
+	}
+
+private:
+	options opt;
 };
 
 int main()
