@@ -126,6 +126,8 @@ void x11::window::proc(XEvent& event)
 		{
 			KeySym key;
 			char str[255];
+			// TODO: use Xutf8LookupString variant instead
+			// see example: https://gist.github.com/baines/5a49f1334281b2685af5dcae81a6fa8a
 			auto len = XLookupString(&event.xkey, str, sizeof(str), &key, 0);
 			if (len > 0)
 				owner->on_key_char(std::string(str, len));
