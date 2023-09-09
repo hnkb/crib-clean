@@ -28,6 +28,7 @@ namespace
 
 				case WM_SIZE:
 					wnd->on_size_changed({ LOWORD(lParam), HIWORD(lParam) });
+					InvalidateRect(handle, nullptr, FALSE);
 					return 0;
 
 				case WM_ERASEBKGND:
