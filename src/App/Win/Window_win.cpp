@@ -107,8 +107,6 @@ Window::Window(Options opt)
 		opt.pos.x = CW_USEDEFAULT;
 	if (opt.title.empty())
 		opt.title = "Crib";
-	if (opt.typeId.empty())
-		opt.typeId = "Crib";
 
 	if (opt.size.x != CW_USEDEFAULT)
 	{
@@ -122,7 +120,7 @@ Window::Window(Options opt)
 	wcex.cbSize = sizeof(WNDCLASSEXW);
 	wcex.hInstance = GetModuleHandleW(nullptr);
 	wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-	wcex.lpszClassName = Platform::Win::WideString(opt.typeId);
+	wcex.lpszClassName = Platform::Win::windowClassName;
 	wcex.lpfnWndProc = proc;
 	RegisterClassExW(&wcex);
 

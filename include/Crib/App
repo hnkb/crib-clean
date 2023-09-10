@@ -54,7 +54,6 @@ namespace Crib::App
 
 	struct Window::Options
 	{
-		std::string typeId;
 		std::string title;
 		int2 pos;
 		int2 size;
