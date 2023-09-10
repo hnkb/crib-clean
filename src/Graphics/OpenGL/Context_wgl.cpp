@@ -37,7 +37,7 @@ namespace
 
 		auto dummy = CreateWindowEx(
 			0,
-			Crib::Platform::Win::windowClassName,
+			Crib::Platform::Win::windowClass,
 			L"dummy",
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,

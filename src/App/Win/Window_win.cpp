@@ -120,7 +120,7 @@ Window::Window(Options opt)
 	wcex.cbSize = sizeof(WNDCLASSEXW);
 	wcex.hInstance = GetModuleHandleW(nullptr);
 	wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-	wcex.lpszClassName = Platform::Win::windowClassName;
+	wcex.lpszClassName = Platform::Win::windowClass;
 	wcex.lpfnWndProc = proc;
 	RegisterClassExW(&wcex);
 

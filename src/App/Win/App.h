@@ -9,6 +9,6 @@ namespace Crib::Platform::Win
 
 	enum class Message : UINT { closed = (WM_APP + 501), quit = (WM_APP + 502) };
 
-	constexpr auto windowClassName = L"Crib";
+	constexpr auto windowClass = L"Crib";
 
 }
