@@ -1,0 +1,3 @@
+[submodule "third-party/ttf2mesh"]
+	path = third-party/ttf2mesh
+	url = https://github.com/fetisov/ttf2mesh.git
