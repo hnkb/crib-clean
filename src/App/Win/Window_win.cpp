@@ -83,7 +83,7 @@ namespace
 					window->impl = nullptr;
 					PostMessageW(
 						nullptr,
-						(UINT)Crib::Platform::Win::WindowMessage::closed,
+						(UINT)Crib::Platform::Win::Message::closed,
 						0,
 						0);
 					return 0;

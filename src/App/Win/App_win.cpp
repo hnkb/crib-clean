@@ -18,8 +18,8 @@ int Crib::App::run()
 		TranslateMessage(&msg);
 		DispatchMessageW(&msg);
 
-		if ((msg.message == (UINT)Platform::Win::WindowMessage::quit)
-			|| (msg.message == (UINT)Platform::Win::WindowMessage::closed
+		if ((msg.message == (UINT)Platform::Win::Message::quit)
+			|| (msg.message == (UINT)Platform::Win::Message::closed
 				&& EnumThreadWindows(
 					GetCurrentThreadId(),
 					[](HWND, LPARAM) { return FALSE; },
