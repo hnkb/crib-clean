@@ -8,6 +8,7 @@ project(Crib
 
 add_executable(Crib
 	"src/App/Window.cpp"
+	"src/Graphics/Font.cpp"
 	"src/Graphics/OpenGL/Context_gl.cpp"
 	"src/main.cpp"
 )
@@ -52,4 +53,4 @@ if (MSVC)
 endif()
 
 add_subdirectory("third-party")
-target_link_libraries(Crib PRIVATE glad)
+target_link_libraries(Crib PRIVATE glad ttf2mesh)

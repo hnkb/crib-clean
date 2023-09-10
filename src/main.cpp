@@ -2,6 +2,7 @@
 #include <iostream>
 #include <Crib/App>
 
+void startFont();
 
 class MyWindow : public Crib::App::Window
 {
@@ -48,6 +49,9 @@ int main()
 {
 	try
 	{
+		//startFont();
+		//return 0;
+
 		//Crib::App::Window win;
 		MyWindow win2;
 		auto win = std::move(win2);

@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <vector>
 
+#include "../Font.h"
+
 using Crib::Graphics::OpenGL::Context;
 
 
@@ -107,20 +109,81 @@ void InitializeProgram()
 	std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
 }
 
-const float vertexPositions[] = {
-	0.75f, 0.75f, 0.0f, 1.0f, 0.75f, -0.75f, 0.0f, 1.0f, -0.75f, -0.75f, 0.0f, 1.0f,
+const float4 vertexPositions[] = {
+	{ 0.75f,  0.75f, 0.0f, 1.0f},
+	{ 0.75f, -0.75f, 0.0f, 1.0f},
+	{-0.75f, -0.75f, 0.0f, 1.0f},
 };
 
 GLuint positionBufferObject;
 GLuint vao;
 
+float scaleX = 1.f;
+std::vector<float4> fontVertices;
 
 void InitializeVertexBuffer()
 {
+	Font font(LR"(C:\Users\hani\Downloads\overpass-bold.ttf)");
+
+	float scaleFactor = 1.1f*.3f;
+	float2 scale = { scaleFactor / scaleX, scaleFactor };
+	float2 xlate = { -.8f, -.5f };
+
+	for (auto symbol : std::wstring(L"crib graphics playground"))
+	{
+		if (symbol == ' ')
+			xlate.x += .15f * scale.x;
+		try
+		{
+			auto g = font.getGlyph(symbol);
+
+			//printf("x bounds %f %f\n", g.glyph->xbounds[0], g.glyph->xbounds[1]);
+			//printf("y bounds %f %f\n", g.glyph->ybounds[0], g.glyph->ybounds[1]);
+			//printf("Faces: %d, Vertices: %d\n", g.mesh->nfaces, g.mesh->nvert);
+
+			fontVertices.reserve(g.mesh->nfaces * 3);
+
+			for (int i = 0; i < g.mesh->nfaces; i++)
+			{
+				auto getVert = [&](auto idx) {
+					auto& v = g.mesh->vert[idx];
+					return float4 { (v.x /*+ g.glyph->lbearing*/) * scale.x + xlate.x,
+									v.y * scale.y + xlate.y,
+									0.f,
+									1.f };
+				};
+
+				auto& a = getVert(g.mesh->faces[i].v1);
+				auto& b = getVert(g.mesh->faces[i].v2);
+				auto& c = getVert(g.mesh->faces[i].v3);
+
+				// printf("   %2d -> %f %f    %f %f    %f %f\n", i, a.x, a.y, b.x, b.y, c.x,
+				// c.y);
+
+				fontVertices.push_back(a);
+				fontVertices.push_back(b);
+				fontVertices.push_back(c);
+			}
+
+			xlate.x +=
+				(g.glyph->xbounds[1] - g.glyph->xbounds[0] + g.glyph->rbearing) * scale.x;
+			// xlate.x += g.glyph->advance * scale.x;
+		}
+		catch (...)
+		{
+			xlate.x += .05f * scale.x;
+		}
+	}
+
 	glGenBuffers(1, &positionBufferObject);
 
 	glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		sizeof(float4) * fontVertices.size(),
+		fontVertices.data(),
+		GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -138,6 +201,15 @@ void initGL_3()
 void Context::onResize(int2 dims)
 {
 	glViewport(0, 0, dims.x, dims.y);
+
+	scaleX = dims.x / (float)dims.y;
+
+	//float w = dims.x;
+	//float h = dims.y;
+	//if (h > w)
+	//	glViewport(0, (h - w) / 2, w, w);
+	//else
+	//	glViewport((w - h) / 2, 0, h, h);
 }
 
 void Context::readDeviceDescription(int swapInterval)
@@ -179,7 +251,8 @@ void Context::drawPlatformIndependent()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, fontVertices.size());
 
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
