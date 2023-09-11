@@ -17,6 +17,15 @@ namespace Crib::App
 	int run();
 
 
+	struct MouseEvent
+	{
+		enum class Type { ButtonDown, ButtonUp, Move };
+		enum class Button { Left, Middle, Right };
+		Type type;
+		Button button;
+		int2 pos;
+	};
+
 	class Window
 	{
 	public:
@@ -43,6 +52,7 @@ namespace Crib::App
 
 		// protected:
 		virtual bool onInput() { return false; }
+		virtual void onMouseEvent(const MouseEvent&) {}
 		virtual void onKeyChar(const std::string& text) {}
 		virtual void onPositionChanged(int2 pos);
 		virtual void onSizeChanged(int2 dims);

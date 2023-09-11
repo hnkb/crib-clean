@@ -3,6 +3,7 @@
 #include <Crib/App>
 #include "../../Graphics/OpenGL/Context.h"
 #include <Crib/Platform/Win>
+#include <windowsx.h>
 
 using Crib::App::Window;
 
@@ -16,18 +17,45 @@ namespace
 
 		if (window)
 		{
-			// if ((message >= WM_MOUSEFIRST && message <= WM_MOUSELAST) || message ==
-			// WM_KEYDOWN
-			//	|| message == WM_KEYUP)
+			if ((message >= WM_MOUSEFIRST && message <= WM_MOUSELAST))
+			{
+				using Crib::App::MouseEvent;
+
+				MouseEvent ev;
+				ev.pos.x = GET_X_LPARAM(lParam);
+				ev.pos.y = GET_Y_LPARAM(lParam);
+
+				switch (message)
+				{
+					case WM_MOUSEMOVE:
+						ev.type = MouseEvent::Type::Move;
+						break;
+					case WM_LBUTTONDOWN:
+					case WM_MBUTTONDOWN:
+					case WM_RBUTTONDOWN:
+						SetCapture(handle);
+						ev.type = MouseEvent::Type::ButtonDown;
+						break;
+					case WM_LBUTTONUP:
+					case WM_RBUTTONUP:
+					case WM_MBUTTONUP:
+						ReleaseCapture();
+						ev.type = MouseEvent::Type::ButtonUp;
+						break;
+				}
+				if (message == WM_LBUTTONDOWN || message == WM_LBUTTONUP)
+					ev.button = MouseEvent::Button::Left;
+				else if (message == WM_MBUTTONDOWN || message == WM_MBUTTONUP)
+					ev.button = MouseEvent::Button::Middle;
+				else if (message == WM_RBUTTONDOWN || message == WM_RBUTTONUP)
+					ev.button = MouseEvent::Button::Right;
+
+				window->onMouseEvent(ev);
+				return 0;
+			}
+
+			//if (message == WM_KEYDOWN || message == WM_KEYUP)
 			//{
-			//	if (message == WM_LBUTTONDOWN || message == WM_RBUTTONDOWN
-			//		|| message == WM_MBUTTONDOWN)
-			//		SetCapture(handle);
-
-			//	if (message == WM_LBUTTONUP || message == WM_RBUTTONUP
-			//		|| message == WM_MBUTTONUP)
-			//		ReleaseCapture();
-
 			//	input.push(message, wParam, lParam, timer.now());
 			//	return 0;
 			//}
