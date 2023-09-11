@@ -18,6 +18,7 @@ public:
 	};
 
 	Glyph getGlyph(wchar_t symbol);
+	Glyph getGlyph(int index);
 
 private:
 	ttf_t* font = nullptr;

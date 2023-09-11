@@ -5,6 +5,9 @@
 void startFont();
 
 float2 offset = { 0.f, 0.f };
+float scale = .25f;
+std::string text;
+extern float scaleX;
 
 
 class MyWindow : public Crib::App::Window
@@ -21,6 +24,8 @@ public:
 	{
 		Window::onSizeChanged(dims);
 		printf("size\n");
+
+		opt.size = dims;
 	}
 	void onPositionChanged(int2 pos) override
 	{
@@ -48,7 +53,9 @@ public:
 		{
 			opt.title += str;
 		}
-		setOptions(opt);
+		//setOptions(opt);
+		text = opt.title;
+		draw();
 	}
 	void onMouseEvent(const Crib::App::MouseEvent& ev)
 	{
@@ -57,7 +64,10 @@ public:
 		if (ev.type == MouseEvent::Type::ButtonDown)
 		{
 			if (dragStartPos.x == -1)
+			{
 				dragStartPos = ev.pos;
+				dragStartOffset = offset;
+			}
 		}
 		else if (ev.type == MouseEvent::Type::ButtonUp)
 		{
@@ -66,8 +76,38 @@ public:
 		}
 		else if (ev.type == MouseEvent::Type::Move && dragStartPos.x != -1)
 		{
-			offset = toFloat2(ev.pos - dragStartPos) / 400.f;
+			offset = toFloat2(ev.pos - dragStartPos) / 400.f / scale;
 			offset.y *= -1.f;
+			offset += dragStartOffset;
+			draw();
+		}
+		else if (ev.type == MouseEvent::Type::Wheel)
+		{
+			// first, I convert from pixel space to range -1...1
+			auto screen = toFloat2(ev.pos) / toFloat2(opt.size) * 2.f - 1.f;
+			screen.y *= -1;
+
+			// this is the reverse of the transformation in my shader:
+			// screen = (world + offset) * scale
+
+			// I have two values for scale (before and after).
+			// I want the screen to point to the same world coordinates, but it does not.
+			// So, I have to add the difference between worldBefore and worldAfter to my offset.
+			//
+			// Therefore:
+			//     world_before = screen / scale_before - offset
+			//  -  world_after  = screen / scale_after  - offset
+			// --------------------------------------------------
+			//        diff       = (screen / scale_before) - (screen / scale_after)
+
+			float2 scale_before = { scale / scaleX, scale };
+
+			scale *= powf(1.25f, ev.wheel);
+
+			float2 scale_after = { scale / scaleX, scale };
+
+			offset -= screen / scale_before - screen / scale_after;
+
 			draw();
 		}
 	}
@@ -75,6 +115,7 @@ public:
 private:
 	Options opt;
 	int2 dragStartPos = { -1 };
+	float2 dragStartOffset = {};
 };
 
 int main()

@@ -3,11 +3,16 @@
 #include <glad/glad.h>
 #include <algorithm>
 #include <vector>
+#include <map>
 
 #include "../Font.h"
 
 using Crib::Graphics::OpenGL::Context;
 
+extern float2 offset;
+extern float scale;
+extern std::string text;
+extern float scaleX;
 
 GLuint theProgram = 0;
 
@@ -83,10 +88,12 @@ GLuint CreateProgram(const std::vector<GLuint>& shaderList)
 
 const std::string strVertexShader(
 	"#version 330 core\n"
-	"layout(location = 0) in vec4 position;"
+	"layout(location = 0) in vec2 position;"
+	"uniform vec2 offset;"
+	"uniform vec2 scale;"
 	"void main()"
 	"{"
-	"   gl_Position = position;"
+	"   gl_Position = vec4((position+offset)*scale, 0, 1.0);"
 	"}");
 
 const std::string strFragmentShader(
@@ -118,83 +125,142 @@ const float4 vertexPositions[] = {
 GLuint positionBufferObject;
 GLuint vao;
 
-float scaleX = 1.f;
-std::vector<float4> fontVertices;
+
+
+class Buffer
+{
+public:
+	GLuint vertex;
+	GLuint index;
+} buffer;
+
+
+struct DrawableObject
+{
+	void* start;
+	GLsizei numPoints;
+	GLuint objectId;
+
+	float advance;
+	float lbearing;
+};
+std::map<wchar_t, DrawableObject> objects;
+
+
+DrawableObject tt;
 
 void InitializeVertexBuffer()
 {
 	Font font(LR"(C:\Users\hani\Downloads\overpass-bold.ttf)");
 
-	float scaleFactor = 1.1f*.3f;
-	float2 scale = { scaleFactor / scaleX, scaleFactor };
-	float2 xlate = { -.8f, -.5f };
 
-	for (auto symbol : std::wstring(L"crib graphics playground"))
+	// temporary buffers to store CPU-side data
+
+	std::vector<float2> vert;
+	std::vector<GLushort> index;
+	std::map<wchar_t, void*> vertOffsets;
+
+	vert.reserve(font->nglyphs * 125);
+	index.reserve(font->nglyphs * 125);
+
+
+	int numErrors = 0;
+	for (int glyphIdx = 0; glyphIdx < font->nglyphs; glyphIdx++)
 	{
-		if (symbol == ' ')
-			xlate.x += .15f * scale.x;
 		try
 		{
-			auto g = font.getGlyph(symbol);
+			auto g = font.getGlyph(glyphIdx);
 
-			//printf("x bounds %f %f\n", g.glyph->xbounds[0], g.glyph->xbounds[1]);
-			//printf("y bounds %f %f\n", g.glyph->ybounds[0], g.glyph->ybounds[1]);
-			//printf("Faces: %d, Vertices: %d\n", g.mesh->nfaces, g.mesh->nvert);
+			//wprintf(L" '%c' %d vert  %d idx\n", g.glyph->symbol, g.mesh->nvert, g.mesh->nfaces);
 
-			fontVertices.reserve(g.mesh->nfaces * 3);
+
+			auto& obj = objects[g.glyph->symbol];
+
+			obj.advance = g.glyph->advance;
+			obj.lbearing = g.glyph->lbearing;
+			obj.start = (void*)(index.size() * sizeof(GLushort));
+			vertOffsets[g.glyph->symbol] = (void*)(vert.size() * sizeof(vert[0]));
+
+			for (int i = 0; i < g.mesh->nvert; i++)
+				vert.push_back(float2 { g.mesh->vert[i].x, g.mesh->vert[i].y });
 
 			for (int i = 0; i < g.mesh->nfaces; i++)
 			{
-				auto getVert = [&](auto idx) {
-					auto& v = g.mesh->vert[idx];
-					return float4 { (v.x /*+ g.glyph->lbearing*/) * scale.x + xlate.x,
-									v.y * scale.y + xlate.y,
-									0.f,
-									1.f };
-				};
-
-				auto& a = getVert(g.mesh->faces[i].v1);
-				auto& b = getVert(g.mesh->faces[i].v2);
-				auto& c = getVert(g.mesh->faces[i].v3);
-
-				// printf("   %2d -> %f %f    %f %f    %f %f\n", i, a.x, a.y, b.x, b.y, c.x,
-				// c.y);
-
-				fontVertices.push_back(a);
-				fontVertices.push_back(b);
-				fontVertices.push_back(c);
+				index.push_back(g.mesh->faces[i].v1);
+				index.push_back(g.mesh->faces[i].v2);
+				index.push_back(g.mesh->faces[i].v3);
 			}
 
-			xlate.x +=
-				(g.glyph->xbounds[1] - g.glyph->xbounds[0] + g.glyph->rbearing) * scale.x;
-			// xlate.x += g.glyph->advance * scale.x;
+			obj.numPoints = g.mesh->nfaces * 3;
 		}
 		catch (...)
 		{
-			xlate.x += .05f * scale.x;
+			numErrors++;
 		}
 	}
 
-	glGenBuffers(1, &positionBufferObject);
+	printf("Encountered %d errors while loading\n", numErrors);
+	// printf("\n\n In total\n   %d vertices\n   %d indices\n", vert.size(), index.size());
 
-	glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
-	glBufferData(
-		GL_ARRAY_BUFFER,
-		sizeof(float4) * fontVertices.size(),
-		fontVertices.data(),
-		GL_STATIC_DRAW);
+
+	//////////////////// create buffers and copy data //////////////////////////
+
+	glGenBuffers(1, &buffer.vertex);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer.vertex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vert[0]) * vert.size(), vert.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &buffer.index);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.index);
+	glBufferData(
+		GL_ELEMENT_ARRAY_BUFFER,
+		sizeof(index[0]) * index.size(),
+		index.data(),
+		GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	////////////////////// create objects for each glyph ///////////////////////
+
+	for (auto& obj : objects)
+	{
+		glGenVertexArrays(1, &obj.second.objectId);
+		glBindVertexArray(obj.second.objectId);
+
+		glBindBuffer(GL_ARRAY_BUFFER, buffer.vertex);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, vertOffsets.at(obj.first));
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.index);
+
+		glBindVertexArray(0);
+	}
+
+
+	{
+		glGenVertexArrays(1, &tt.objectId);
+		glBindVertexArray(tt.objectId);
+
+		glBindBuffer(GL_ARRAY_BUFFER, buffer.vertex);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.index);
+
+		glBindVertexArray(0);
+	}
 }
 
+GLint offsetLocation;
+GLint scaleLocation;
 
 void initGL_3()
 {
 	InitializeProgram();
 	InitializeVertexBuffer();
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	offsetLocation = glGetUniformLocation(theProgram, "offset");
+	scaleLocation = glGetUniformLocation(theProgram, "scale");
 }
 
 
@@ -203,13 +269,6 @@ void Context::onResize(int2 dims)
 	glViewport(0, 0, dims.x, dims.y);
 
 	scaleX = dims.x / (float)dims.y;
-
-	//float w = dims.x;
-	//float h = dims.y;
-	//if (h > w)
-	//	glViewport(0, (h - w) / 2, w, w);
-	//else
-	//	glViewport((w - h) / 2, 0, h, h);
 }
 
 void Context::readDeviceDescription(int swapInterval)
@@ -247,13 +306,35 @@ void Context::drawPlatformIndependent()
 
 	glUseProgram(theProgram);
 
-	glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	float2 scale2d = { scale / scaleX, scale };
+	//glUniform1f(scaleLocation, scale);
+	glUniform2fv(scaleLocation, 1, (float*)&scale2d);
 
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	glDrawArrays(GL_TRIANGLES, 0, fontVertices.size());
+	float xStart = -2;
+	//-.8 / scale;
+	float2 textPos = { xStart, -xStart - .9f };
 
-	glDisableVertexAttribArray(0);
+	for (auto symbol : text + "_")  // std::wstring(L"prognosis"))
+	{
+		if (symbol == ' ')
+			textPos.x += .2f;
+		else if (symbol == '\n')
+		{
+			textPos.x = xStart;
+			textPos.y -= 1.1f;
+		}
+		else if (objects.find(symbol) != objects.end())
+		{
+			auto& obj = objects.at(symbol);
+			auto pos = offset + textPos;
+			//pos.x += obj.lbearing * scale;
+			glBindVertexArray(obj.objectId);
+			glUniform2fv(offsetLocation, 1, (float*)&pos);
+			glDrawElements(GL_TRIANGLES, obj.numPoints, GL_UNSIGNED_SHORT, obj.start);
+			textPos.x += obj.advance;
+		}
+	}
+
+	glBindVertexArray(0);
 	glUseProgram(0);
 }

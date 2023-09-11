@@ -21,7 +21,11 @@ Font::Glyph Font::getGlyph(wchar_t symbol)
 	auto index = ttf_find_glyph(font, symbol);
 	if (index < 0)
 		throw std::invalid_argument("glyph not found in the font");
+	return getGlyph(index);
+}
 
+Font::Glyph Font::getGlyph(int index)
+{
 	Glyph ret;
 	ret.glyph = &font->glyphs[index];
 
