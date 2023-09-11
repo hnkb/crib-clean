@@ -42,6 +42,13 @@ namespace
 						ReleaseCapture();
 						ev.type = MouseEvent::Type::ButtonUp;
 						break;
+					case WM_MOUSEWHEEL:
+						ev.type = MouseEvent::Type::Wheel;
+						ev.wheel = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+
+						// WM_MOUSEWHEEL, unlike other events, returns screen coordinates!
+						ScreenToClient(handle, (LPPOINT)&ev.pos);
+						break;
 				}
 				if (message == WM_LBUTTONDOWN || message == WM_LBUTTONUP)
 					ev.button = MouseEvent::Button::Left;
@@ -75,6 +82,10 @@ namespace
 							&& IS_LOW_SURROGATE(next.wParam))
 							buffer[1] = (wchar_t)next.wParam;
 					}
+
+					if (buffer[0] == 13)  // substitute \r with \n
+						buffer[0] = 10;
+
 					window->onKeyChar(buffer);
 					return 0;
 				}

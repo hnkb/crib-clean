@@ -19,11 +19,12 @@ namespace Crib::App
 
 	struct MouseEvent
 	{
-		enum class Type { ButtonDown, ButtonUp, Move };
+		enum class Type { ButtonDown, ButtonUp, Move, Wheel };
 		enum class Button { Left, Middle, Right };
 		Type type;
 		Button button;
 		int2 pos;
+		int wheel;
 	};
 
 	class Window
