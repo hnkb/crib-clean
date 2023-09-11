@@ -1,13 +1,14 @@
 
 #include <iostream>
 #include <Crib/App>
+#include <cmath>
 
 void startFont();
 
 float2 offset = { 0.f, 0.f };
 float scale = .25f;
 std::string text;
-extern float scaleX;
+float scaleX = 1.f;
 
 
 class MyWindow : public Crib::App::Window
@@ -57,7 +58,7 @@ public:
 		text = opt.title;
 		draw();
 	}
-	void onMouseEvent(const Crib::App::MouseEvent& ev)
+	void onMouseEvent(const Crib::App::MouseEvent& ev) override
 	{
 		using Crib::App::MouseEvent;
 
