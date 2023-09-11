@@ -50,11 +50,9 @@ target_include_directories(Crib PUBLIC
 
 if (MSVC)
 	target_compile_options(Crib PRIVATE "/utf-8" "/fp:fast" "/Qpar")
+	target_link_options(Crib PRIVATE "/ENTRY:mainCRTStartup")
 endif()
+
 
 add_subdirectory("third-party")
 target_link_libraries(Crib PRIVATE glad ttf2mesh)
-
-
-
-target_link_options(Crib PRIVATE "/ENTRY:mainCRTStartup")
