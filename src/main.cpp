@@ -24,14 +24,14 @@ public:
 	void onSizeChanged(int2 dims) override
 	{
 		Window::onSizeChanged(dims);
-		printf("size\n");
+		printf("size %d %d\n", dims.x, dims.y);
 
 		opt.size = dims;
 	}
 	void onPositionChanged(int2 pos) override
 	{
 		Window::onPositionChanged(pos);
-		printf("move\n");
+		//printf("move\n");
 	}
 	void onKeyChar(const std::string& str) override
 	{
