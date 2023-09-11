@@ -6,7 +6,7 @@ project(Crib
 	HOMEPAGE_URL https://github.com/hnkb/crib
 )
 
-add_executable(Crib
+add_executable(Crib WIN32
 	"src/App/Window.cpp"
 	"src/Graphics/Font.cpp"
 	"src/Graphics/OpenGL/Context_gl.cpp"
@@ -54,3 +54,7 @@ endif()
 
 add_subdirectory("third-party")
 target_link_libraries(Crib PRIVATE glad ttf2mesh)
+
+
+
+target_link_options(Crib PRIVATE "/ENTRY:mainCRTStartup")
