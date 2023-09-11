@@ -242,7 +242,10 @@ void App::Window::close()
 
 App::Window::Options App::Window::getOptions() const
 {
-	return {};
+	Options opt;
+	opt.pos = ((X11::Window*)impl)->pos;
+	opt.size = ((X11::Window*)impl)->dims;
+	return opt;
 }
 
 App::Window& App::Window::setOptions(const Options& opt)

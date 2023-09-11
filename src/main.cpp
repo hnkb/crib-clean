@@ -20,7 +20,9 @@ public:
 			{400, 300},
 			{800, 800}
     })
-	{}
+	{
+		opt = getOptions(); // on X11 we won't receive any size change after constructor!
+	}
 	void onSizeChanged(int2 dims) override
 	{
 		Window::onSizeChanged(dims);
