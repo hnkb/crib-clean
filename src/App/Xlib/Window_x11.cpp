@@ -56,7 +56,8 @@ X11::Window::Window(Crib::App::Window* owner, const Crib::App::Window::Options& 
 	XSelectInput(
 		disp,
 		wnd,
-		StructureNotifyMask | ExposureMask | ButtonPressMask | KeyPressMask);
+		StructureNotifyMask | ExposureMask | ButtonPressMask | ButtonReleaseMask
+			| PointerMotionMask | KeyPressMask);
 
 	XSetWMProtocols(disp, wnd, &App::windowClosed, 1);
 
@@ -134,18 +135,35 @@ void X11::Window::proc(XEvent& event)
 		break;
 
 		case ButtonPress:
+		case ButtonRelease:
+		case MotionNotify:
 		{
-			// static int numPress = 1;
-			// numPress++;
-			// if (owner.context)
-			// {
-			// 	dynamic_cast<Graphics::gl::context*>(owner.context)->bkg = colors[numPress % 5];
-			// 	// owner.context->draw();
-			// 	XClearArea(App::display, wnd, 0, 0, 0, 0, True);
-			// }
+			using Crib::App::MouseEvent;
+			auto m = event.xbutton;
+			MouseEvent ev;
+			ev.pos = { m.x, m.y };
+
+			if (m.button == 4 || m.button == 5)
+			{
+				ev.type = MouseEvent::Type::Wheel;
+				ev.wheel = m.button == 4 ? 1 : -1;
+			}
+			else if (m.type == MotionNotify)
+			{
+				ev.type = MouseEvent::Type::Move;
+			}
+			else
+			{
+				ev.button = m.button == 1 ? MouseEvent::Button::Left :
+											(m.button == 2 ? MouseEvent::Button::Middle :
+															 MouseEvent::Button::Right);
+				ev.type = m.type == ButtonPress ? MouseEvent::Type::ButtonDown :
+												  MouseEvent::Type::ButtonUp;
+			}
+
+			owner->onMouseEvent(ev);
 		}
-			printf("Don't click mouse button!\n");
-			break;
+		break;
 
 		default:
 			break;
