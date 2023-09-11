@@ -48,3 +48,16 @@ struct float4x4
 {
 	float4 c0, c1, c2, c3;
 };
+
+
+// clang-format off
+static inline float2 operator+(float2 a, float2 b) { return { a.x + b.x, a.y + b.y }; }
+static inline float2 operator-(float2 a, float2 b) { return { a.x - b.x, a.y - b.y }; }
+
+static inline float2 operator/(float2 v, float s) { return { v.x / s, v.y / s }; }
+
+static inline int2 operator+(int2 a, int2 b) { return { a.x + b.x, a.y + b.y }; }
+static inline int2 operator-(int2 a, int2 b) { return { a.x - b.x, a.y - b.y }; }
+
+static inline float2 toFloat2(int2 a) { return { (float)a.x, (float)a.y }; }
+// clang-format on
