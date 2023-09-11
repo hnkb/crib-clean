@@ -2,6 +2,7 @@
 #include "Font.h"
 #include <stdexcept>
 
+using Crib::Font;
 
 Font::Font(const std::filesystem::path& filename)
 {
