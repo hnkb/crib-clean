@@ -151,7 +151,7 @@ DrawableObject tt;
 
 void InitializeVertexBuffer()
 {
-	Font font(LR"(C:\Users\hani\Downloads\overpass-bold.ttf)");
+	Crib::Font font("/home/hani/Desktop/overpass-bold.ttf");
 
 
 	// temporary buffers to store CPU-side data
@@ -318,7 +318,7 @@ void Context::drawPlatformIndependent()
 	{
 		if (symbol == ' ')
 			textPos.x += .2f;
-		else if (symbol == '\n')
+		else if (symbol == '\n'||symbol=='\r')
 		{
 			textPos.x = xStart;
 			textPos.y -= 1.1f;
