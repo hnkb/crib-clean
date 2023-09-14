@@ -1,0 +1,93 @@
+name: Build and test on all platforms
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    name: build (${{ matrix.os }}-${{ matrix.compiler }})
+
+    strategy:
+      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations.
+      fail-fast: false
+
+      matrix:
+        os: [ windows, ubuntu, mac ]
+        compiler: [ cl, gcc, clang ]
+        build_type: [ Release ]
+
+        exclude:
+          # - os: windows
+          #   compiler: gcc
+          # - os: windows
+          #   compiler: clang
+          - os: ubuntu
+            compiler: cl
+          - os: mac
+            compiler: cl
+          - os: mac
+            compiler: gcc
+
+        include:
+          - os: windows
+            runner: windows-latest
+          - os: ubuntu
+            runner: ubuntu-latest
+          - os: mac
+            runner: macos-latest
+
+          - compiler: cl
+            cc: cl
+            cxx: cl
+          - compiler: gcc
+            cc: gcc
+            cxx: g++
+          - compiler: clang
+            cc: clang
+            cxx: clang++
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install Ninja
+      uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: (Windows) Enable MSVC Developer Command Prompt (needed for Ninja)
+      uses: ilammy/msvc-dev-cmd@v1.12.1
+      if: ${{ (matrix.os == 'windows') && (matrix.compiler == 'cl') }}
+
+    - name: (Windows) Enable MSYS2 and install Mingw-w64
+      if: ${{ (matrix.os == 'windows') && (matrix.compiler == 'gcc') }}
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: >-
+          mingw-w64-x86_64-ninja
+
+    - name: Set reusable strings
+      # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: Configure CMake
+      run: >
+        cmake -G "Ninja"
+        -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+        -DCMAKE_C_COMPILER=${{ matrix.cc }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }}
+
+    - name: Test
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: ctest
