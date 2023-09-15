@@ -51,6 +51,8 @@ target_include_directories(Crib PUBLIC
 if (MSVC)
 	target_compile_options(Crib PRIVATE "/utf-8" "/fp:fast" "/Qpar")
 	target_link_options(Crib PRIVATE "/ENTRY:mainCRTStartup")
+elseif (WIN32 AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")) # and CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
+	target_link_options(Crib PRIVATE -Xlinker /ENTRY:mainCRTStartup)
 endif()
 
 
