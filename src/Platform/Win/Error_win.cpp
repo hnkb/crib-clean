@@ -44,7 +44,7 @@ namespace
 Crib::Platform::Win::Error::Error(std::error_code code) : system_error(std::move(code))
 {
 #if defined(__MINGW32__)
-	message = getWindowsErrorMessage(code().value());
+	message = getWindowsErrorMessage(code.value());
 #else
 	message = system_error::code().message();
 #endif
