@@ -47,8 +47,8 @@ jobs:
             cc: gcc
             cxx: g++
           - compiler: clang
-            cc: clang
-            cxx: clang++
+            cc: clang-16
+            cxx: clang++-16
 
     steps:
     - name: Checkout repository
